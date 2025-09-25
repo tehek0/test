@@ -29,16 +29,10 @@ int main()
 
     cout << "Высота трапеции: ";
     cin >> h;
-    if (h>256)
-        return 0;
     cout << "Нижнее основание трапеции: ";
     cin >> a;
-    if (a>1001)
-        return 0;
     cout << "Верхнее основание трапеции: ";
     cin >> b;
-    if (b>1001)
-        return 0;
     r = ((a + b) * (int)h) / 2;
     cout << "Площадь трапеции: " << r << endl;
     return r;
