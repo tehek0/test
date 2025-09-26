@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <clocale>
+#include <limits>
 
 using namespace std;
 int main()
@@ -9,13 +10,14 @@ int main()
     unsigned short h; // unsigned short, т.к. длина не может быть отрицательной и предел short'а достаточно большой для условия поставленной задачи, притом занимает меньше памяти, чем int
     unsigned short a; // см. строку 9
     unsigned short b; // см. строку 9
-    float r; // float, т.к. длина не может быть отрицательной и максимальный возможный результат уравнения может превысить предел short'а
-    
+    float r; // float, т.к. максимальный возможный результат уравнения может быть не натуральным
+
     unsigned short sizeofshort = 8 * sizeof(unsigned short);
     unsigned short sizeoffloat = 8 * sizeof(float);
     unsigned short maximumshort = pow(2, sizeofshort) - 1;
-    short minimumshort = (pow(2,sizeofshort) - maximumshort - 1)*(-1);
-
+    float maximumfloat = numeric_limits<float>::max();
+    short minimumshort = (pow(2, sizeofshort) - maximumshort - 1) * (-1);
+    float minimumfloat = numeric_limits<float>::min();
 
     cout << "Использованные типы данных:\nunsigned short - Размер в памяти: "
         << sizeofshort
@@ -26,9 +28,9 @@ int main()
         << "\nfloat - Размер в памяти: "
         << sizeoffloat
         << " бит, минимальное значение: "
-        << ""
+        << minimumfloat
         << ", максимальное значение: "
-        << ""
+        << maximumfloat
         << "\n\n";
 
     cout << "Высота трапеции: ";
