@@ -17,7 +17,7 @@ int main()
     unsigned short maximumshort = pow(2, sizeofshort) - 1;
     float maximumfloat = numeric_limits<float>::max();
     short minimumshort = (pow(2, sizeofshort) - maximumshort - 1) * (-1);
-    float minimumfloat = numeric_limits<float>::min();
+    float minimumfloat = numeric_limits<float>::lowest();
 
     cout << "Использованные типы данных:\nunsigned short - Размер в памяти: "
         << sizeofshort
