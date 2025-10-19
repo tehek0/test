@@ -25,11 +25,12 @@ int main()
         ++i;
         if (i == kol) {
 
-            file_out << "{";
+            int rightplace = 0;
             for (int m = 0; m < kol; ++m) {
-                file_out << " " << mass[m] << " ";
+                if (mass[m] == exm[m]) 
+                    ++rightplace;
             }
-            file_out << "}" << endl;
+            file_out << rightplace << endl;
 
             for (int k = 0; k < kol; ++k) {
                 if (mass[k] != exm[k]) {

@@ -59,25 +59,6 @@ int main() {
 		}
 		ArrHasPositives[i] = HasPositives;
 	}
-	cout << endl << "Массив количества положительных чисел в столбцах: ";
-	for (char j = 0; j < MatCol; ++j)
-	{
-		short getchar = ArrHasPositives[j];
-		cout << getchar << " ";
-	}
-	cout << endl << endl;
-
-	if ((ArrHasPositives[0] == ArrHasPositives[1]) && (ArrHasPositives[1] == ArrHasPositives[2]) && (ArrHasPositives[2] == ArrHasPositives[3])) {
-		cout << "Матрица: ";
-		for (char i = 0; i < MatRow; ++i) {
-			cout << endl;
-			for (char j = 0; j < MatCol; ++j)
-			{
-				cout << Mat[i][j] << " ";
-			}
-		}
-		return 1;
-	}
 
 	char SelectCol = 0;
 	for (char i = 1; i < MatCol; ++i) {
