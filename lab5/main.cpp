@@ -19,23 +19,32 @@ int Item1() {
             ++counter;
         }
     };
+    int case2_arr[2];
+    char tmp;
     switch (counter)
     {
     case 2:
-    {
-        result = twonumbers(item1_arr);
+        tmp = 0;
+        for (char i = 0; i < 3; ++i) {
+            if (item1_arr[i] != 0) {
+                case2_arr[tmp] = item1_arr[i];
+                ++tmp;
+            }
+        };
+        result = numbers(case2_arr[0],case2_arr[1]);
         break;
     case 3:
-        result = threenumbers(item1_arr);
+        result = numbers(item1_arr);
         break;
     default:
         break;
     }
     return result;
-    }
+    
 };
     int main() {
         setlocale(LC_ALL, "Russian");
+        cerr << "Running Main Function" << endl;
         unsigned short item;
         int main_result;
         cout << "Введите номер пункта: ";
@@ -57,7 +66,9 @@ int Item1() {
             cin >> b;
             Lab1(h, a, b);
             break;
-        default: cerr << "Пункт не найден :("; return 0;
+        default: 
+            cerr << "Пункт не найден :("; 
+            return 1;
         }
     }
 
