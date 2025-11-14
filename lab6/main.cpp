@@ -105,6 +105,12 @@ void item1() {
 		}
 		++new_col;
 	}
+
+	for (int i = col; i > new_col; --i) {
+		for (int j = 0; j < row; ++j) {
+			memory[j][i] = 0;
+		}
+	}
 	
 	
 
