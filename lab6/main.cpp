@@ -1,6 +1,6 @@
 // Вариант 2
 #include <iostream>
-#include <stdlib.h>
+
 using namespace std;
 
 int counter = 0;
