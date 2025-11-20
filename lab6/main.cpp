@@ -5,12 +5,13 @@ using namespace std;
 
 int counter = 0;
 int* get_zeros(int** memory, int row, int col) {
-	int* arr = static_cast<int*>(calloc(col * row, sizeof(int)));
+	int* arr = (int*)(calloc(col * row, sizeof(int)));
 	for (int i = 0; i < row; ++i) {
 		for (int j = 0; j < col; ++j) {
-			if (memory[j][i] == 0) {
+			if (memory[i][j] == 0) {
 				arr[counter] = i;
 				++counter;
+				break;
 			}
 		}
 	}
@@ -21,7 +22,7 @@ int* get_zeros(int** memory, int row, int col) {
 void print_memory(int** memory, int row, int col) {
 	for (int i = 0; i < row; ++i) {
 		for (int j = 0; j < col; ++j) {
-			cout << memory[j][i] << " ";
+			cout << memory[i][j] << " ";
 		}
 		cout << endl;
 	}
@@ -30,44 +31,70 @@ void print_memory(int** memory, int row, int col) {
 void item1() {
 	const char base_col = 2;
 	const char base_row = 2;
-	int** memory = static_cast<int**>(calloc(base_col, sizeof(int*)));
-	for (int i = 0; i < base_col; ++i) {
-		memory[i] = static_cast<int*>(calloc(base_row, sizeof(int)));
+	int** memory = (int**)calloc(base_col, sizeof(int*));
+	for (int i = 0; i < base_row; ++i) {
+		memory[i] = (int*)calloc(base_row, sizeof(int));
+		for (int j = 0; j < base_col; ++j) {
+			int input;
+			switch (i)
+			{
+			case 0:
+			{
+				switch (j) {
+				case 0:
+					cout << "Введите A строк для добавления вверх: "; break;
+				case 1:
+					cout << "Введите B строк для добавления влево: "; break;
+				default:
+					break;
+				}
+				do {
+					cin >> input;
+					if (input < 0)
+						cout << "Введите корректное значение: ";
+				} while (input < 0);
+				break;
+			}
+			case 1:
+			{
+				switch (j) {
+				case 0:
+					cout << "Введите коэфициент C: "; break;
+				case 1:
+					cout << "Введите коэфициент Д: "; break;
+				default:
+					break;
+				}
+				cin >> input;
+				break;
+			}
+			default:
+				break;
+			}
+			memory[i][j] = input;
+		}
 	}
 
-	cout << "Введите A строк для добавления вверх: ";
-	do {
-		cin >> memory[0][0];
-		if (memory[0][0] < 0)
-			cout << "Введите корректное значение: ";
-	} while (memory[0][0] < 0);
-
-	cout << "Введите B строк для добавления влево: ";
-	do {
-		cin >> memory[1][0];
-		if (memory[1][0] < 0)
-			cout << "Введите корректное значение: ";
-	} while (memory[1][0] < 0);
-
-	cout << "Введите коэфициент C: ";
-	cin >> memory[0][1];
-
-	cout << "Введите коэфициент Д: ";
-	cin >> memory[1][1];
-
-	int col = (base_col + memory[1][0]);
 	int row = (base_row + memory[0][0]);
-	size_t col_size = col * sizeof(int*);
-	size_t row_size = row * sizeof(int);
+	int col = (base_col + memory[0][1]);
+	
+	int col_size = col * sizeof(int);
+	int row_size = row * sizeof(int*);
 	int indexes = col * row;
-	memory = static_cast<int**>(realloc(memory, col_size));
-	for (int i = base_col; i < col; ++i) {
-		memory[i] = static_cast<int*>(malloc(row_size));
+	memory = (int**)(realloc(memory, row_size));
+	for (int i = base_col; i < row; ++i) {
+		memory[i] = (int*)(calloc(col, sizeof(int)));
 	}
-	memory[col - 1][row - 1] = memory[1][1];
-	memory[col - 1][row - 2] = memory[1][0];
-	memory[col - 2][row - 1] = memory[0][1];
-	memory[col - 2][row - 2] = memory[0][0];
+	for (int i = 0; i < row; ++i) {
+		memory[i] = (int*)(realloc(memory[i], col_size));
+	}
+	
+	
+	memory[row - 2][col - 2] = memory[0][0];
+	memory[row - 2][col - 1] = memory[0][1];
+	memory[row - 1][col - 1] = memory[1][1];
+	memory[row - 1][col - 2] = memory[1][0];
+	
 	
 
 	for (int i = 0; i < row; ++i) {
@@ -75,9 +102,9 @@ void item1() {
 			if ((i >= row - 2) && (j == col - 2)) {
 				break;
 			}
-			memory[j][i] = ((i * memory[col - 2][row - 1]) + (j * memory[col - 1][row - 1]));
-			cerr << endl << ((i * memory[col - 2][row - 1]) + (j * memory[col - 1][row - 1]));
+			memory[i][j] = ((i * memory[row - 1][col - 2]) + (j * memory[row - 1][col - 1]));
 			
+
 		}
 
 	}
@@ -85,7 +112,7 @@ void item1() {
 	cout << endl << "Исходная матрица: " << endl;
 	print_memory(memory, row, col);
 	cout << endl;
-
+	
 	int new_row = 0;
 	int* zero_array = get_zeros(memory, row, col);
 	for (int i = 0; i < row; ++i) {
@@ -100,26 +127,25 @@ void item1() {
 				--new_row;
 				break;
 			}
-			memory[j][new_row] = memory[j][i];
-			
+			memory[new_row][j] = memory[i][j];
+
 		}
 		++new_row;
 	}
+	
+	
 
-	for (int i = row; i > new_row; --i) {
-		for (int j = 0; j < col; ++j) {
-			memory[j][i] = 0;
-		}
+	for (int i = new_row; i < row; ++i) {
+		free(memory[i]);
 	}
-	
-	
+
+
 
 	cout << "Новая матрица: " << endl;
 	print_memory(memory, new_row, col);
 
-	
-	for (int i = 0; i < col; ++i) {
-		memory[i] = static_cast<int*>(realloc(memory[i], row_size));
+
+	for (int i = 1; i < new_row; ++i) {
 		free(memory[i]);
 	}
 
@@ -129,7 +155,7 @@ void item1() {
 }
 
 void item2() {
-	
+
 	int* A = new int;
 	int* B = new int;
 
@@ -137,8 +163,8 @@ void item2() {
 	cin >> *A;
 	cout << "Введите B: ";
 	cin >> *B;
-	
-	
+
+
 	*A *= 2;
 	int* pTmp = new int(*B);
 	*B = *A;
@@ -158,6 +184,6 @@ int main() {
 
 	item1();
 	item2();
-	
+
 	exit(0);
 }
