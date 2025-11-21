@@ -28,7 +28,10 @@ void print_memory(int** memory, int row, int col) {
 	}
 }
 
-void item1() {
+
+int main() {
+	setlocale(LC_ALL, "Russian");
+
 	const char base_col = 2;
 	const char base_row = 2;
 	int** memory = (int**)calloc(base_col, sizeof(int*));
@@ -152,9 +155,6 @@ void item1() {
 	free(memory);
 	free(zero_array);
 
-}
-
-void item2() {
 
 	int* A = new int;
 	int* B = new int;
@@ -176,14 +176,6 @@ void item2() {
 	delete A;
 	delete B;
 	delete pTmp;
-}
-
-
-int main() {
-	setlocale(LC_ALL, "Russian");
-
-	item1();
-	item2();
 
 	exit(0);
 }
