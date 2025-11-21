@@ -83,7 +83,6 @@ int main() {
 	
 	int col_size = col * sizeof(int);
 	int row_size = row * sizeof(int*);
-	int indexes = col * row;
 	memory = (int**)(realloc(memory, row_size));
 	for (int i = base_col; i < row; ++i) {
 		memory[i] = (int*)(calloc(col, sizeof(int)));
