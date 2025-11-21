@@ -90,10 +90,10 @@ void item1() {
 	}
 	
 	
-	memory[row - 2][col - 2] = memory[0][0];
-	memory[row - 2][col - 1] = memory[0][1];
-	memory[row - 1][col - 1] = memory[1][1];
-	memory[row - 1][col - 2] = memory[1][0];
+	memory[row - 2][col - 2] = memory[0][0]; // A
+	memory[row - 2][col - 1] = memory[0][1]; // B
+	memory[row - 1][col - 1] = memory[1][1]; // C
+	memory[row - 1][col - 2] = memory[1][0]; // Д
 	
 	
 
@@ -145,7 +145,7 @@ void item1() {
 	print_memory(memory, new_row, col);
 
 
-	for (int i = 1; i < new_row; ++i) {
+	for (int i = 0; i < new_row; ++i) {
 		free(memory[i]);
 	}
 
