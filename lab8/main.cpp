@@ -32,10 +32,7 @@ void Put(Book* head, string author, string name, unsigned int tome_number, unsig
         headref->next = book;
         return;
     }
-    while ((headref->next != nullptr) && (headref->next->author != author)) {
-        headref = headref->next;
-    }
-    while ((headref->next != nullptr) && (headref->next->name != name)) {
+    while ((headref->next != nullptr) && (headref->next->author != author) && (headref->next->name != name)) {
         headref = headref->next;
     }
     while ((headref->next != nullptr) && (headref->next->tome_number < tome_number)) {
@@ -48,10 +45,11 @@ void Put(Book* head, string author, string name, unsigned int tome_number, unsig
 
 void Print(Book* head) {
     Book* printer = head;
+    int counter = 0;
     while (printer->next != nullptr) {
         printer = printer->next;
-        cout << printer->author << " \"" << printer->name << "\", " << "Том " << printer->tome_number << ", " << printer->pages << " стр." << endl;
-        
+        cout << counter << ") " << printer->author << " \"" << printer->name << "\", " << "Том " << printer->tome_number << ", " << printer->pages << " стр." << endl;
+        ++counter;
     }
 }
 
@@ -105,6 +103,30 @@ void SeekForEasiest(Book* head, string author) {
     PrintSingle(head, selected_id);
 }
 
+int AddSummer(Book* head, Book* summer, string author, string name) {
+
+    Book* headref = head;
+    Book* summerref = summer;
+    int counter = 0;
+    
+    if ((headref->next == nullptr)) {
+        cout << "В библиотеке нет книг :(";
+        return 0;
+    }
+
+    while ((headref->next != nullptr) && (headref->next->author != author) && (headref->next->name != name)) {
+        headref = headref->next;
+    }
+    while ((headref->next != nullptr) && (headref->next->author == author) && (headref->next->name == name)) {
+        summerref->next = headref;
+        headref = headref->next;
+        summerref = summerref->next;
+        ++counter;
+    }
+
+    return counter;
+}
+
 void MenuCallView(Book* head) {
     int element;
     cout << "Введите номер элемента (введите -1 для вывода всего): ";
@@ -143,16 +165,52 @@ void MenuCallSeekFor(Book* head) {
     (type == 1 ? SeekForHardest(head, author) : SeekForEasiest(head, author));
 }
 
+void MenuCallSummer(Book* head, Book* summer) {
+    
+    string author;
+    string name;
+    int summerinput;
+    while (true) {
+        cout << endl << "- Сборка чтения на лето -" << endl
+            << endl << "1. Добавить тексты"
+            << endl << "2. Завершить"
+            << endl << endl << "Ввод: ";
+        cin >> summerinput;
+        int counter;
+        switch (summerinput) {
+        case 1:
+            cout << endl << "Введите автора: ";
+            cin >> author;
+            cout << endl << "Введите название: ";
+            cin >> name;
+
+            counter = AddSummer(head, summer, author, name);
+            cout << endl << "Добавлено " << counter << " томов.";
+            break;
+        case 2:
+            Print(summer->next);
+            return;
+        default:
+            break;
+        }
+    }
+    
+
+}
+
 int main()
 {
     setlocale(LC_ALL, "Russian");
     SetConsoleCP(1251);
+
 
     Book library;
     library.next = nullptr;
 
     Book summer;
     summer.next = nullptr;
+
+
     short input;
     
     while (true) {
@@ -174,6 +232,7 @@ int main()
             MenuCallSeekFor(&library);
             break;
         case 4:
+            MenuCallSummer(&library, &summer);
             break;
         default:
             cout << "Неизвестное значение." << endl;
