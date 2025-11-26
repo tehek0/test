@@ -23,7 +23,7 @@ Book* Make(Book* head, string author, string name, unsigned int tome_number, uns
 }
 
 void Put(Book* head, string author, string name, unsigned int tome_number, unsigned int pages) {
-    
+
     Book* book = Make(head, author, name, tome_number, pages);
     Book* headref = head;
 
@@ -32,7 +32,7 @@ void Put(Book* head, string author, string name, unsigned int tome_number, unsig
         headref->next = book;
         return;
     }
-    while ((headref->next != nullptr) && (headref->next->author != author) && (headref->next->name != name)) {
+    while ((headref->next != nullptr) && ((headref->next->author != author) || (headref->next->name != name))) {
         headref = headref->next;
     }
     while ((headref->next != nullptr) && (headref->next->tome_number < tome_number)) {
@@ -40,6 +40,24 @@ void Put(Book* head, string author, string name, unsigned int tome_number, unsig
     }
 
     book->next = headref->next;
+    headref->next = book;
+}
+
+void PutLast(Book* head, string author, string name, unsigned int tome_number, unsigned int pages) {
+
+    Book* book = Make(head, author, name, tome_number, pages);
+    Book* headref = head;
+
+    if ((headref->next == nullptr)) {
+        book->next = nullptr;
+        headref->next = book;
+        return;
+    }
+    while (headref->next != nullptr) {
+        headref = headref->next;
+    }
+
+    book->next = nullptr;
     headref->next = book;
 }
 
@@ -65,6 +83,18 @@ void PrintSingle(Book* head, int element) {
         return;
     }
     cout << "Этого элемента ещё не существует." << endl;
+}
+
+void Clear(Book* head) {
+    Book* cleaner = head;
+    if (cleaner->next == nullptr)
+        return;
+    cleaner = cleaner->next;
+    while (cleaner->next != nullptr) {
+        Book* tmp = cleaner;
+        cleaner = cleaner->next;
+        delete tmp;
+    }
 }
 
 void SeekForHardest(Book* head, string author) {
@@ -106,7 +136,6 @@ void SeekForEasiest(Book* head, string author) {
 int AddSummer(Book* head, Book* summer, string author, string name) {
 
     Book* headref = head;
-    Book* summerref = summer;
     int counter = 0;
     
     if ((headref->next == nullptr)) {
@@ -114,16 +143,14 @@ int AddSummer(Book* head, Book* summer, string author, string name) {
         return 0;
     }
 
-    while ((headref->next != nullptr) && (headref->next->author != author) && (headref->next->name != name)) {
+    while ((headref->next != nullptr) && ((headref->next->author != author) || (headref->next->name != name))) {
         headref = headref->next;
     }
     while ((headref->next != nullptr) && (headref->next->author == author) && (headref->next->name == name)) {
-        summerref->next = headref;
         headref = headref->next;
-        summerref = summerref->next;
+        PutLast(summer, headref->author, headref->name, headref->tome_number, headref->pages);
         ++counter;
     }
-
     return counter;
 }
 
@@ -172,8 +199,8 @@ void MenuCallSummer(Book* head, Book* summer) {
     int summerinput;
     while (true) {
         cout << endl << "- Сборка чтения на лето -" << endl
-            << endl << "1. Добавить тексты"
-            << endl << "2. Завершить"
+            << endl << "1. Добавить тексты."
+            << endl << "2. Завершить и посмотреть."
             << endl << endl << "Ввод: ";
         cin >> summerinput;
         int counter;
@@ -185,10 +212,10 @@ void MenuCallSummer(Book* head, Book* summer) {
             cin >> name;
 
             counter = AddSummer(head, summer, author, name);
-            cout << endl << "Добавлено " << counter << " томов.";
+            cout << endl << "Добавлено " << counter << (counter < 5 ? (counter == 1 ? " том." : " тома.") : " томов.");
             break;
         case 2:
-            Print(summer->next);
+            Print(summer);
             return;
         default:
             break;
@@ -215,6 +242,7 @@ int main()
     
     while (true) {
         cout << endl << "- - - Книжник - - -" << endl << endl
+            << "0. Выход." << endl
             << "1. Просмотр элемента." << endl
             << "2. Создание и помещение нового элемента." << endl
             << "3. Поиск самого сложного/лёгкого текста автора." << endl
@@ -222,6 +250,10 @@ int main()
             << endl << "Ввод: ";
         cin >> input;
         switch (input) {
+        case 0:
+            Clear(&library);
+            Clear(&summer);
+            return 0;
         case 1:
             MenuCallView(&library);
             break;
