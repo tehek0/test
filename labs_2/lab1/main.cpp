@@ -3,20 +3,22 @@
 
 using namespace std;
 
+const unsigned int _govIDlength = 8;
+const unsigned int _bodyIDminlength = 9;
+const unsigned int _bodyIDmaxlength = 12;
+
 class car {
 
 public:
 
-	car() {
+	car() = default;
 
-	}
-
-	car(car& copy) {
-		_mark = copy.get_mark();
-		_model = copy.get_model();
-		_govID = copy.get_govID();
-		_bodyID = copy.get_bodyID();
-		_mileage = copy.get_mileage();
+	car(const car& copy) {
+		_mark = copy._mark;
+		_model = copy._model;
+		_govID = copy._govID;
+		_bodyID = copy._bodyID;
+		_mileage = copy._mileage;
 	}
 
 	car(string mark, string model, string govid, string bodyid, unsigned int mileage) {
@@ -105,9 +107,6 @@ private:
 	string _model;
 	string _govID;
 	string _bodyID;
-	const unsigned int _govIDlength = 8;
-	const unsigned int _bodyIDminlength = 9;
-	const unsigned int _bodyIDmaxlength = 12;
 	unsigned int _mileage = 0;
 
 };
