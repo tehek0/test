@@ -53,6 +53,8 @@ car::car(string mark, string model, string govid)
 
 car::~car()
 {
+	_items.clear();
+	_items.shrink_to_fit();
 	cerr << endl << "Запущен деструктор" << endl;
 }
 
@@ -228,6 +230,13 @@ void car::items_leave_common(vector<string>& items) {
 			--i;
 		}
 	}
+}
+
+car car::operator=(car& other) {
+	this->_mark = other._mark;
+	this->_model = other._model;
+	this->_govID = other._govID;
+	this->_items = other._items;
 }
 
 car car::operator+(car& other){

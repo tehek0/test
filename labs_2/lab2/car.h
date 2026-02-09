@@ -47,6 +47,7 @@ public:
 	void items_leave_unique();
 	void items_leave_common(vector<string>& items);
 
+	car operator=(car& other);
 	car operator+(car& other);
 	car operator-(car& other);
 	car operator/(car& other);
