@@ -43,16 +43,16 @@ car::car() :
 	_items{ "default1", "default2" },
 	_mileage(0)
 {
-	cerr << endl << "������� ����������� �����������" << endl;
+	cerr << endl << "Запущен стандартный конструктор" << endl;
 }
 
 car::car(const car& copy)
 {
 	if (&copy == nullptr) {
-		cout << endl << "������ nullptr � ������������ �����������" << endl;
+		cout << endl << "Указан nullptr в конструкторе копирования" << endl;
 		exit(3);
 	}
-	cerr << endl << "������� ����������� �����������" << endl;
+	cerr << endl << "Запущен конструктор копирования" << endl;
 	_mark = copy._mark;
 	_model = copy._model;
 	_govID = copy._govID;
@@ -63,20 +63,20 @@ car::car(const car& copy)
 
 car::car(string mark, string model, string govid, string bodyid, unsigned int mileage)
 {
-	cerr << endl << "������� ����������� ������� ����������" << endl;
+	cerr << endl << "Запущен конструктор полного заполнения" << endl;
 	_mark = mark;
 	_model = model;
 	set_govID(govid);
 	set_bodyID(bodyid);
 	_items = {};
-	_mileage = _mileage;
+	_mileage = mileage;
 }
 
 car::~car()
 {
 	_items.clear();
 	_items.shrink_to_fit();
-	cerr << endl << "������� ����������" << endl;
+	cerr << endl << "Запущен деструктор" << endl;
 }
 
 string car::get_mark() {
@@ -94,12 +94,12 @@ string car::get_item(unsigned int id) {
 
 void car::info() {
 	cout << endl
-		<< "�����: " << _mark << endl
-		<< "������: " << _model << endl
-		<< "���. �����: " << _govID << endl
+		<< "Марка: " << _mark << endl
+		<< "Модель: " << _model << endl
+		<< "Гос. номер: " << _govID << endl
 		<< "Номер кузова: " << _bodyID << endl
-		<< "Километраж: " << _mileage << endl
-		<< "�����: ";
+		<< "Пробег: " << _mileage << endl
+		<< "Багаж: ";
 	print_items();
 	cout << endl;
 }
@@ -121,7 +121,7 @@ void car::set_model(string model) {
 }
 void car::set_govID(string id) try {
 	if (govIDformat(id) == false) {
-		throw invalid_argument("[set_govID] ������������ ������ ���. ������");
+		throw invalid_argument("[set_govID] Неподходящий формат гос. номера");
 	}
 
 	_govID = id;
@@ -133,7 +133,7 @@ catch (invalid_argument& error) {
 }
 void car::set_bodyID(string id) try {
 	if (bodyIDformat(id) == false) {
-		throw invalid_argument("[set_bodyID] ������������ ������ номера кузова");
+		throw invalid_argument("[set_bodyID] Неподходящий формат номера кузова");
 	}
 
 	_bodyID = id;
@@ -153,7 +153,7 @@ void car::add_item(string item) {
 void car::add_item(string item, unsigned int id) {
 	try {
 		if (_items.size() < id) {
-			throw invalid_argument("[set_item] ����� �� ������� �������");
+			throw invalid_argument("[set_item] Выход за пределы вектора");
 		}
 		_items.reserve(_items.size() + 1);
 		_items.insert(_items.begin() + id, item);
@@ -167,7 +167,7 @@ void car::add_item(string item, unsigned int id) {
 void car::set_item(unsigned int id, string item) {
 	try {
 		if (_items.size() < id) {
-			throw invalid_argument("[set_item] ����� �� ������� �������");
+			throw invalid_argument("[set_item] Выход за пределы вектора");
 		}
 		_items[id] = item;
 	}
@@ -188,7 +188,7 @@ void car::rm_item(string item) {
 void car::rm_item(unsigned int id) {
 	try {
 		if (_items.size() < id) {
-			throw invalid_argument("[rm_item] ����� �� ������� �������");
+			throw invalid_argument("[rm_item] Выход за пределы вектора");
 		}
 		_items.erase(_items.begin() + id);
 		_items.shrink_to_fit();
