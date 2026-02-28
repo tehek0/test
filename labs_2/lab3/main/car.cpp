@@ -29,7 +29,7 @@ inline bool car::bodyIDformat(string& bodyid) {
 		if ((bodyidlen > _bodyIDmaxlength) || (bodyidlen < _bodyIDminlength))
 			return false;
 		for (int i = 0; i < bodyidlen; ++i) {
-			if ((isspace(bodyid[i]) == true) || (ispunct(bodyid[i]) == true) || (isascii(bodyid[i]) == false))
+			if ((isspace(bodyid[i]) == 1) || (ispunct(bodyid[i]) == 1) || (isascii(bodyid[i]) == false))
 				return false;
 		}
 		return true;
@@ -288,6 +288,7 @@ car car::operator=(car& other) {
 	this->_bodyID = other._bodyID;
 	this->_mileage = other._mileage;
 	this->_items = other._items;
+	return *this;
 }
 
 car car::operator+(car& other){
