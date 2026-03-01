@@ -88,6 +88,9 @@ string car::get_model() {
 string car::get_govID() {
 	return _govID;
 }
+string car::get_bodyID() {
+	return _bodyID;
+}
 string car::get_item(unsigned int id) {
 	return _items[id];
 }
@@ -281,14 +284,13 @@ void car::lower_mileage(unsigned int X) {
 		_mileage -= X;
 }
 
-car car::operator=(car& other) {
+void car::operator=(car& other) {
 	this->_mark = other._mark;
 	this->_model = other._model;
 	this->_govID = other._govID;
 	this->_bodyID = other._bodyID;
 	this->_mileage = other._mileage;
 	this->_items = other._items;
-	return *this;
 }
 
 car car::operator+(car& other){

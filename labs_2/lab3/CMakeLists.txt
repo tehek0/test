@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
-project(labs2_3)
+project(labs2_3_main)
+set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(lib)
-add_subdirectory(main)
+add_executable(labs2_3_main src/main.cpp src/car.cpp)
+target_link_libraries(labs2_3_main labs2_3_lib)
