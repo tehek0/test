@@ -43,16 +43,16 @@ car::car() :
 	_items{ "default1", "default2" },
 	_mileage(0)
 {
-	cerr << endl << "Запущен стандартный конструктор" << endl;
+	cerr << endl << "Запущен стандартный конструктор car" << endl;
 }
 
 car::car(const car& copy)
 {
 	if (&copy == nullptr) {
-		cout << endl << "Указан nullptr в конструкторе копирования" << endl;
+		cout << endl << "Указан nullptr в конструкторе копирования car" << endl;
 		exit(3);
 	}
-	cerr << endl << "Запущен конструктор копирования" << endl;
+	cerr << endl << "Запущен конструктор копирования car" << endl;
 	_mark = copy._mark;
 	_model = copy._model;
 	_govID = copy._govID;
@@ -63,7 +63,7 @@ car::car(const car& copy)
 
 car::car(string mark, string model, string govid, string bodyid, unsigned int mileage)
 {
-	cerr << endl << "Запущен конструктор полного заполнения" << endl;
+	cerr << endl << "Запущен конструктор полного заполнения car" << endl;
 	_mark = mark;
 	_model = model;
 	set_govID(govid);
@@ -76,7 +76,7 @@ car::~car()
 {
 	_items.clear();
 	_items.shrink_to_fit();
-	cerr << endl << "Запущен деструктор" << endl;
+	cerr << endl << "Запущен деструктор car" << endl;
 }
 
 string car::get_mark() {

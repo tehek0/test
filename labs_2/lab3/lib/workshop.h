@@ -28,6 +28,7 @@ public:
     string get_address();
     void add_speaker(speaker& speaker);
     speaker get_speaker(unsigned int speakerid);
+    speaker get_car_speaker(string govid);
     void print_speakers();
     void attach_car(car& car);
     void attach_speaker_to_car(unsigned int speakerid, string govid);

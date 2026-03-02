@@ -9,6 +9,10 @@
 
 
 	class car {
+		
+		friend void workshop::attach_speaker_to_car(unsigned int speakerid, string govid);
+		friend speaker workshop::get_car_speaker(string govid);
+
 	private:
 		string _mark;
 		string _model;
@@ -23,11 +27,7 @@
 		bool govIDformat(string& govid);
 		bool bodyIDformat(string& bodyid);
 
-
 	public:
-
-		friend void workshop::attach_speaker_to_car(unsigned int speakerid, string govid);
-
 		car();
 		car(const car& copy);
 		car(string mark, string model, string govid, string bodyid, unsigned int _mileage);

@@ -92,11 +92,25 @@ void workshop::attach_speaker_to_car(unsigned int speakerid, string govid) {
         car& temp = *_attached_cars[i];
         if (temp._govID == govid) {
             _attached_cars[i]->_speaker = _available_speakers[speakerid];
+            _available_speakers.erase(_available_speakers.begin() + speakerid);
             return;
         } else {
             continue;
         }
     }
-    cerr << "[attach_speaker_to_car] Не найдена машина с адресом \"" << govid << "\"";
+    cerr << "[attach_speaker_to_car] Не найдена машина с номером \"" << govid << "\"";
+    exit(5);
+}
+
+speaker workshop::get_car_speaker(string govid) {
+    for (int i = 0; i < _attached_cars.size(); ++i) {
+        car& temp = *_attached_cars[i];
+        if (temp._govID == govid) {
+            return temp._speaker;
+        } else {
+            continue;
+        }
+    }
+    cerr << "[get_car_speaker] Не найдена машина с номером \"" << govid << "\"";
     exit(5);
 }
