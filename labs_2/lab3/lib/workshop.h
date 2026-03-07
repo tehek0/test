@@ -32,4 +32,5 @@ public:
     void print_speakers();
     void attach_car(car& car);
     void attach_speaker_to_car(unsigned int speakerid, string govid);
+    void print_cars();
 };

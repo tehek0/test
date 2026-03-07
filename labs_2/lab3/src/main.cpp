@@ -1,8 +1,15 @@
 #include "car.h"
 
+void review() {
+    cout << "Интерес: 7/10" << endl
+    << "Наполненность: 10/10" << endl
+    << "Сложность: 9/10" << endl << endl;
+}
+
 int main() {
     srand(time(0));
 	setlocale(LC_ALL, "ru_RU.UTF-8");
+    review();
     car a;
     car b;
     car test = a + b;
@@ -24,19 +31,26 @@ int main() {
     d.desc = "speaker desc 4";
     d.price = 96;
     c.add_speaker(d);
-    c.print_speakers();
     c.attach_car(test);
     c.attach_car(a);
     c.attach_car(b);
 
+    
+
     int selector;
     string govid;
 
-    cout << endl << "1) " << test.get_govID() << endl << "2) " << a.get_govID() << endl << "3) " << b.get_govID() << endl << endl;
+    while (true) {
+    c.print_speakers();
+    cout << endl << "Выберите колонку по id: ";
     cin >> selector;
+    c.print_cars();
+    cout << endl << "Выберите машину по гос. номеру: ";
     cin >> govid;
     c.attach_speaker_to_car(selector, govid);
-    c.print_speakers();
 
+    cout << endl << endl;
     c.get_car_speaker(govid).print();
+    cout << endl << endl;
+    }
 }

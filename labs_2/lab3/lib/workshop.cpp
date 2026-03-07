@@ -114,3 +114,14 @@ speaker workshop::get_car_speaker(string govid) {
     cerr << "[get_car_speaker] Не найдена машина с номером \"" << govid << "\"";
     exit(5);
 }
+
+void workshop::print_cars() {
+	size_t size = _attached_cars.size();
+	cout << "[\n";
+	for (int i = 0; i < size; ++i) {
+		cout << i << ") ";
+        (_attached_cars[i])->info();
+	}
+	cout << "]";
+
+}
