@@ -17,6 +17,14 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+
+
+    void on_author_textEdited(const QString &arg1);
+
+
+    void on_discard_pressed();
+
 private:
     Ui::MainWindow *ui;
 };
