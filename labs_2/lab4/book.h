@@ -12,11 +12,7 @@ private:
     QString _type;
     std::vector<QString> _genres;
 public:
-    QString get_author();
-    QString get_name();
-    QString get_code();
-    QString get_contents();
-    QString get_type();
+    book(QString& author, QString& name, QString& code, QString& contents, QString& type, std::vector<QString>& genres);
     QString get_genre(size_t id);
     void write_to_file();
 };
