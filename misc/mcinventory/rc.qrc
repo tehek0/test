@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>inventory.png</file>
+        <file>chest.png</file>
+        <file>brick.png</file>
+        <file>carrot.png</file>
+        <file>diamond.png</file>
+        <file>diamond_boots.png</file>
+        <file>diamond_chestplate.png</file>
+        <file>diamond_helmet.png</file>
+        <file>diamond_leggings.png</file>
+        <file>diamond_pickaxe.png</file>
+        <file>diamond_sword.png</file>
+        <file>ender_pearl.png</file>
+    </qresource>
+</RCC>
