@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>rs/apple.png</file>
+        <file>rs/coin.png</file>
+    </qresource>
+</RCC>
