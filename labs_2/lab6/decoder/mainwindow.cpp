@@ -73,10 +73,11 @@ void MainWindow::on_load_clicked()
         incorrect.clear();
         incorrect.close();
     }
-
+    std::vector<QTreeWidgetItem*> items;
     for (unsigned int i = 0; i < parser.size(); ++i) {
         QStringList list_for_item;
         json object = parser[i];
+
         bool is_incorrect = false;
         bool correct_markers[4] = {true, true, true, true};
         if (parser[i].contains("name")) {
@@ -180,7 +181,8 @@ void MainWindow::on_load_clicked()
         qInfo() << i << list_for_item << is_incorrect;
         QTreeWidgetItem* item = new QTreeWidgetItem(list_for_item);
         if (is_incorrect == false) {
-            ui->correct_items->addTopLevelItem(item);
+            items.reserve(items.size() + 1);
+            items.emplace_back(item); // to sort
             add_object(object, QString("correct.json"));
         } else {
             for (char k = 0; k < 4; ++k) {
@@ -190,6 +192,16 @@ void MainWindow::on_load_clicked()
             ui->incorrect_items->addTopLevelItem(item);
             add_object(object, QString("incorrect.json"));
         }
+    }
+    for (size_t i = 0; i < items.size(); ++i) {
+        for (size_t j = i + 1; j < items.size() - 1; ++j) {
+            if (items[i]->text(0) > items[j]->text(0)) {
+                std::swap(items[i],items[j]);
+            }
+        }
+    }
+    for (size_t i = 0; i < items.size(); ++i) {
+        ui->correct_items->addTopLevelItem(items[i]);
     }
     ui->load_error->setStyleSheet("color: rgb(0, 205, 0);");
     ui->load_error->setText("* Предметы добавлены");
