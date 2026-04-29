@@ -83,6 +83,10 @@ void MainWindow::on_load_clicked()
         if (parser[i].contains("name")) {
             if (parser[i]["name"].is_string()) {
                 list_for_item.append(QString::fromStdString(parser[i]["name"]));
+                if (parser[i]["name"].get<std::string>().size() == 0) {
+                    is_incorrect = true;
+                    correct_markers[0] = false;
+                }
             } else {
                 json j = parser[i]["name"];
                 if (j.is_array())
@@ -106,6 +110,10 @@ void MainWindow::on_load_clicked()
         if (parser[i].contains("desc")) {
             if (parser[i]["desc"].is_string()) {
                 list_for_item.append(QString::fromStdString(parser[i]["desc"]));
+                if (parser[i]["desc"].get<std::string>().size() == 0) {
+                    is_incorrect = true;
+                    correct_markers[1] = false;
+                }
             } else {
                 json j = parser[i]["desc"];
                 if (j.is_array())
@@ -127,16 +135,14 @@ void MainWindow::on_load_clicked()
             correct_markers[1] = false;
         }
         if (parser[i].contains("coef")) {
-            if (parser[i]["coef"].is_number_float()) {
+            if (parser[i]["coef"].is_number_float() || parser[i]["coef"].is_number_integer()) {
                 list_for_item.append(QString("%1").arg((double)parser[i]["coef"]));
-                if (parser[i]["coef"] < 0) {
+                if (parser[i]["coef"] < 0 || parser[i]["coef"] > 1) {
                     is_incorrect = true;
                     correct_markers[2] = false;
                 }
             } else {
                 json j = parser[i]["coef"];
-                int j_int = (int)j;
-                qInfo() << j_int;
                 if (j.is_array())
                     list_for_item.append(QString("[ ... ]"));
                 if (j.is_object())
@@ -145,8 +151,6 @@ void MainWindow::on_load_clicked()
                     list_for_item.append(QString::fromStdString(j));
                 if (j.is_boolean())
                     list_for_item.append(QString("%1").arg((bool)j));
-                if (j.is_number_integer())
-                    list_for_item.append(QString("%1").arg((int)j));
                 is_incorrect = true;
                 correct_markers[2] = false;
             }
@@ -158,6 +162,10 @@ void MainWindow::on_load_clicked()
         if (parser[i].contains("type")) {
             if (parser[i]["type"].is_string()) {
                 list_for_item.append(QString::fromStdString(parser[i]["type"]));
+                if (parser[i]["type"].get<std::string>().size() == 0) {
+                    is_incorrect = true;
+                    correct_markers[3] = false;
+                }
             } else {
                 json j = parser[i]["type"];
                 if (j.is_array())
@@ -194,8 +202,8 @@ void MainWindow::on_load_clicked()
         }
     }
     for (size_t i = 0; i < items.size(); ++i) {
-        for (size_t j = i + 1; j < items.size() - 1; ++j) {
-            if (items[i]->text(0) > items[j]->text(0)) {
+        for (size_t j = i; j < items.size(); ++j) {
+            if (items[i]->text(0) < items[j]->text(0)) {
                 std::swap(items[i],items[j]);
             }
         }

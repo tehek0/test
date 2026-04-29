@@ -146,7 +146,7 @@ void MainWindow::on_txt_insert_clicked()
     std::string line;
     // unsigned int line_counter = 0;
     // std::vector<json> objects;
-    QRegularExpression reg_exp("^[\\w, ]+/[\\w,.!? ]+/(((\\d+)(.|,)(\\d+))|(\\d+))/[\\w, ]$", QRegularExpression::UseUnicodePropertiesOption);
+    QRegularExpression reg_exp("^[\\w ]+/[\\w,.!? ]+/(((\\d+)(.|,)(\\d+))|(\\d+))/[\\w ]+$", QRegularExpression::UseUnicodePropertiesOption);
     // while (std::getline(input, line)) {
         // ++line_counter;
     std::getline(input, line);
