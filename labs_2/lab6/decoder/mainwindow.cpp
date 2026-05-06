@@ -18,23 +18,12 @@ MainWindow::~MainWindow()
 }
 
 void add_object(json object, QString path) {
-    json parser;
-    std::ifstream input(path.toStdString());
-    if (input.is_open()) {
-        try {
-            parser = json::parse(input);
-        } catch(...) {
-            parser = json::array();
-        }
-    } else {
-        parser = json::array();
+    std::ofstream output(path.toStdString(), std::ios::app);
+    if (!output.is_open()) {
+        qInfo() << "файл не открылся =(";
+        return;
     }
-
-    parser.push_back(object);
-
-    std::ofstream output(path.toStdString());
-    output.clear();
-    output << parser.dump(2);
+    output << object.dump() << std::endl;
 }
 
 void MainWindow::on_load_clicked()
@@ -46,18 +35,6 @@ void MainWindow::on_load_clicked()
         return;
     }
     std::ifstream input(path.toStdString());
-    json parser;
-    try {
-        parser = json::parse(input);
-    } catch(...) {
-        parser = json::array();
-    }
-
-    if (parser.size() == 0) {
-        ui->load_error->setStyleSheet("color: rgb(255, 0, 0);");
-        ui->load_error->setText("* Файл пуст");
-        return;
-    }
 
     ui->correct_items->clear();
     ui->incorrect_items->clear();
@@ -73,22 +50,29 @@ void MainWindow::on_load_clicked()
         incorrect.clear();
         incorrect.close();
     }
-    std::vector<QTreeWidgetItem*> items;
-    for (unsigned int i = 0; i < parser.size(); ++i) {
+    std::vector<shield> shields;
+    std::string line;
+    while (std::getline(input, line)) {
         QStringList list_for_item;
-        json object = parser[i];
+        json object;
+        try {
+            object = json::parse(line);
+        } catch (...) {
+            qInfo() << "EXCEPTION:" << line << "NOT A JSON OBJECT";
+            continue;
+        }
 
         bool is_incorrect = false;
         bool correct_markers[4] = {true, true, true, true};
-        if (parser[i].contains("name")) {
-            if (parser[i]["name"].is_string()) {
-                list_for_item.append(QString::fromStdString(parser[i]["name"]));
-                if (parser[i]["name"].get<std::string>().size() == 0) {
+        if (object.contains("name")) {
+            if (object["name"].is_string()) {
+                list_for_item.append(QString::fromStdString(object["name"]));
+                if (object["name"].get<std::string>().size() == 0) {
                     is_incorrect = true;
                     correct_markers[0] = false;
                 }
             } else {
-                json j = parser[i]["name"];
+                json j = object["name"];
                 if (j.is_array())
                     list_for_item.append(QString("[ ... ]"));
                 if (j.is_object())
@@ -107,15 +91,15 @@ void MainWindow::on_load_clicked()
             is_incorrect = true;
             correct_markers[0] = false;
         }
-        if (parser[i].contains("desc")) {
-            if (parser[i]["desc"].is_string()) {
-                list_for_item.append(QString::fromStdString(parser[i]["desc"]));
-                if (parser[i]["desc"].get<std::string>().size() == 0) {
+        if (object.contains("desc")) {
+            if (object["desc"].is_string()) {
+                list_for_item.append(QString::fromStdString(object["desc"]));
+                if (object["desc"].get<std::string>().size() == 0) {
                     is_incorrect = true;
                     correct_markers[1] = false;
                 }
             } else {
-                json j = parser[i]["desc"];
+                json j = object["desc"];
                 if (j.is_array())
                     list_for_item.append(QString("[ ... ]"));
                 if (j.is_object())
@@ -134,15 +118,15 @@ void MainWindow::on_load_clicked()
             is_incorrect = true;
             correct_markers[1] = false;
         }
-        if (parser[i].contains("coef")) {
-            if (parser[i]["coef"].is_number_float() || parser[i]["coef"].is_number_integer()) {
-                list_for_item.append(QString("%1").arg((double)parser[i]["coef"]));
-                if (parser[i]["coef"] < 0 || parser[i]["coef"] > 1) {
+        if (object.contains("coef")) {
+            if (object["coef"].is_number_float() || object["coef"].is_number_integer()) {
+                list_for_item.append(QString("%1").arg((double)object["coef"]));
+                if (object["coef"] < 0 || object["coef"] > 1) {
                     is_incorrect = true;
                     correct_markers[2] = false;
                 }
             } else {
-                json j = parser[i]["coef"];
+                json j = object["coef"];
                 if (j.is_array())
                     list_for_item.append(QString("[ ... ]"));
                 if (j.is_object())
@@ -159,15 +143,15 @@ void MainWindow::on_load_clicked()
             is_incorrect = true;
             correct_markers[2] = false;
         }
-        if (parser[i].contains("type")) {
-            if (parser[i]["type"].is_string()) {
-                list_for_item.append(QString::fromStdString(parser[i]["type"]));
-                if (parser[i]["type"].get<std::string>().size() == 0) {
+        if (object.contains("type")) {
+            if (object["type"].is_string()) {
+                list_for_item.append(QString::fromStdString(object["type"]));
+                if (object["type"].get<std::string>().size() == 0) {
                     is_incorrect = true;
                     correct_markers[3] = false;
                 }
             } else {
-                json j = parser[i]["type"];
+                json j = object["type"];
                 if (j.is_array())
                     list_for_item.append(QString("[ ... ]"));
                 if (j.is_object())
@@ -186,13 +170,13 @@ void MainWindow::on_load_clicked()
             is_incorrect = true;
             correct_markers[3] = false;
         }
-        qInfo() << i << list_for_item << is_incorrect;
-        QTreeWidgetItem* item = new QTreeWidgetItem(list_for_item);
+
         if (is_incorrect == false) {
-            items.reserve(items.size() + 1);
-            items.emplace_back(item); // to sort
+            shields.reserve(shields.size() + 1);
+            shields.emplace_back(shield(object));
             add_object(object, QString("correct.json"));
         } else {
+            QTreeWidgetItem* item = new QTreeWidgetItem(list_for_item);
             for (char k = 0; k < 4; ++k) {
                 if (correct_markers[k] == false)
                     item->setBackground(k, QBrush(Qt::red));
@@ -201,15 +185,21 @@ void MainWindow::on_load_clicked()
             add_object(object, QString("incorrect.json"));
         }
     }
-    for (size_t i = 0; i < items.size(); ++i) {
-        for (size_t j = i; j < items.size(); ++j) {
-            if (items[i]->text(0) < items[j]->text(0)) {
-                std::swap(items[i],items[j]);
+    for (size_t i = 0; i < shields.size(); ++i) {
+        for (size_t j = i; j < shields.size(); ++j) {
+            if (shields[i].name < shields[j].name) {
+                std::swap(shields[i],shields[j]);
             }
         }
     }
-    for (size_t i = 0; i < items.size(); ++i) {
-        ui->correct_items->addTopLevelItem(items[i]);
+    for (size_t i = 0; i < shields.size(); ++i) {
+        QStringList list_correct_item;
+        list_correct_item.append(shields[i].name);
+        list_correct_item.append(shields[i].desc);
+        list_correct_item.append(QString::number(shields[i].coef));
+        list_correct_item.append(shields[i].type);
+        QTreeWidgetItem* item = new QTreeWidgetItem(list_correct_item);
+        ui->correct_items->addTopLevelItem(item);
     }
     ui->load_error->setStyleSheet("color: rgb(0, 205, 0);");
     ui->load_error->setText("* Предметы добавлены");

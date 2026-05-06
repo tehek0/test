@@ -17,49 +17,26 @@ MainWindow::~MainWindow()
 }
 
 void add_object(QString name, QString desc, double coef, QString type) {
-    json parser;
-    std::ifstream input("output.json");
-    if (input.is_open()) {
-        try {
-            parser = json::parse(input);
-        } catch(...) {
-            parser = json::array();
-        }
-    } else {
-        parser = json::array();
+    std::ofstream output("output.json", std::ios::app);
+    if (!output.is_open()) {
+        qInfo() << "файл не открылся =(";
+        return;
     }
-
     json object = json::object();
     object["name"] = name.toStdString();
     object["desc"] = desc.toStdString();
     object["coef"] = coef;
     object["type"] = type.toStdString();
-
-    parser.push_back(object);
-
-    std::ofstream output("output.json");
-    output.clear();
-    output << parser.dump(2);
+    output << object.dump() << std::endl;
 }
 
 void add_object(json object) {
-    json parser;
-    std::ifstream input("output.json");
-    if (input.is_open()) {
-        try {
-            parser = json::parse(input);
-        } catch(...) {
-            parser = json::array();
-        }
-    } else {
-        parser = json::array();
+    std::ofstream output("output.json", std::ios::app);
+    if (!output.is_open()) {
+        qInfo() << "файл не открылся =(";
+        return;
     }
-
-    parser.push_back(object);
-
-    std::ofstream output("output.json");
-    output.clear();
-    output << parser.dump(2);
+    output << object.dump() << std::endl;
 }
 
 void MainWindow::on_add_to_json_clicked()
