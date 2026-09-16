@@ -38,7 +38,7 @@ private:
 
 		for (int j = 0; j < sizes[type]; ++j) {
 			if (lower_case(symbol) == output[type][j]) {
-					return;
+				return;
 			}
 		}
 		sizes[type]++;
@@ -84,7 +84,7 @@ private:
 			char i = input[j];
 			if (i == 0)
 				break;
-	
+
 			auto type = get_type(i);
 			if (type != string_types::none) {
 				add_symbol(i, type);
@@ -92,7 +92,7 @@ private:
 		}
 		sort();
 	}
-	
+
 	void console_color(char symbol) {
 		for (int i = 0; i < string_types::size; ++i) {
 			for (int j = 0; j < sizes[i]; ++j) {
@@ -132,6 +132,13 @@ public:
 	}
 	void print() {
 		for (int i = 0; i < string_types::size; ++i) {
+			switch (i) {
+			case 0: std::cout << "\033[31m"; break;
+			case 1: std::cout << "\033[34m"; break;
+			case 2: std::cout << "\033[32m"; break;
+			case 3: std::cout << "\033[33m"; break;
+			default: std::cout << "\033[0m"; break;
+			}
 			for (int j = 0; j < sizes[i]; ++j) {
 				std::cout << output[i][j] << " ";
 			}
@@ -159,7 +166,7 @@ public:
 		}
 		std::cout << "\033[0m\n";
 		input = echo;
-		
+
 	}
 
 	~arr() {
@@ -212,8 +219,43 @@ public:
 			}
 			buffers.emplace_back(buffer);
 		}
+		for (auto buf : buffers) {
+			for (auto symbol : buf) {
+				del(symbol);
+				add_symbol(symbol, get_type(symbol));
+			}
+		}
 		sort();
 		return *this;
+	}
+	arr operator+(arr& other) {
+		arr new_arr = arr(this->input);
+		int num_size = new_arr.sizes[string_types::num];
+		for (int i = 0; i < string_types::size; ++i) {
+			for (int j = 0; j < other.sizes[i]; ++j) {
+				switch (i == 2) {
+					case false: {
+						new_arr.add_symbol(other[i][j], get_type(other[i][j]));
+						break;
+					}
+					case true: {
+						if (j < num_size) {
+							char new_num = new_arr[i][j] + other[i][j] - '0';
+							if (new_num > '9')
+								new_num = '0';
+
+							new_arr[i][j] = new_num;
+						}
+						else {
+							new_arr.add_symbol(other[i][j], string_types::num);
+						}
+						break;
+					}
+				}
+			}
+		}
+		new_arr.sort();
+		return new_arr;
 	}
 };
 
@@ -226,6 +268,10 @@ int main() {
 	auto input_str = std::string(input);
 	arr result = arr(input_str);
 	result.print();
-	++result;
-	result.print();
+	std::cin.getline(input, 50);
+	auto input2_str = std::string(input);
+	arr result2 = arr(input2_str);
+	result2.print();
+	arr result3 = result + result2;
+	result3.print();
 }
