@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <vector>
 
 struct value {
 	double val;
@@ -10,7 +9,7 @@ struct value {
 	}
 	value() = default;
 	value(double val_) {
-		std::cout << "new val: " << val_ << "\n";
+		// std::cout << "new val: " << val_ << "\n";
 		is_undefined = false;
 		val = val_;
 	}
@@ -22,6 +21,9 @@ struct expression : public value {
 	value* val2 = nullptr;
 	char op;
 	double eval() override {
+		if (is_undefined != true)
+			return val;
+
 		if (val1 == nullptr || val2 == nullptr)
 			return 0;
 
@@ -62,7 +64,7 @@ struct expression : public value {
 	expression() = default;
 	expression(value* val1_, value* val2_, char op_) {
 		set_values(val1_, val2_, op_);
-		std::cout << "new expr: " << val1_->eval() << " " << op_ << " " << val2_->eval() << "\n";
+		// std::cout << "new expr: " << val1_->eval() << " " << op_ << " " << val2_->eval() << "\n";
 	}
 	void set_values(value* val1_, value* val2_, char op_) {
 		delete val1;
@@ -73,27 +75,65 @@ struct expression : public value {
 	}
 };
 
-value* parse(std::string& str, int start = 0) {
+value* get_first_expression(std::string& str, int& pos);
+
+value* parse(std::string& str, int& start, value* inherit_expr = nullptr) {
 	std::string num = "";
 	while (start < str.size()) {
 		char symbol = str[start];
 		if (symbol == '(') {
-			if (!(num.size() == 0))
-				return nullptr;
+			inherit_expr = get_first_expression(str, start);
+			++start;
+			symbol = str[start];
 		}
-		if (symbol == '+' || symbol == '-' || symbol == '/' || symbol == '*') {
-			if (num.size() == 0) {
-				return nullptr;
+		if (symbol == '*' || symbol == '/') {
+			start++;
+			if (inherit_expr == nullptr) {
+				inherit_expr = new expression(new value(std::stod(num)), get_first_expression(str, start), symbol);
 			}
-			return new expression(new value(std::stod(num)), parse(str, start + 1), symbol);
+			else {
+				inherit_expr = new expression(inherit_expr, get_first_expression(str, start), symbol);
+			}
+			symbol = str[start];
+			if (symbol == '*' || symbol == '/')
+				continue;
+		}
+		if (symbol == '+' || symbol == '-') {
+			++start;
+			if (inherit_expr == nullptr) {
+				return new expression(new value(std::stod(num)), parse(str, start), symbol);
+			}
+			return new expression(inherit_expr, parse(str, start), symbol);
 		}
 		if (symbol == '=' || symbol == ')') {
-			if (num.empty())
-				return nullptr;
+			++start;
+			if (inherit_expr != nullptr)
+				return inherit_expr;
+			
 			return new value(std::stod(num));
 		}
 		num += symbol;
 		start++;
+	}
+}
+
+value* parse_mod(std::string& str, int& start, value* inherit_expr = nullptr) {
+	return parse(str, start, nullptr);
+}
+
+value* get_first_expression(std::string& str, int& pos) {
+	std::string num = "";
+	while (pos < str.size()) {
+		char symbol = str[pos];
+		if ((symbol < '0' || symbol > '9') && symbol != '.') {
+			if (symbol == '(') {
+				++pos;
+				return parse(str, pos);
+			}
+			return new value(std::stod(num));
+		}
+		num += symbol;
+		pos++;
 	}
 }
 
@@ -131,10 +171,12 @@ int main() {
 		return 0;
 	}
 
-	expression* result = reinterpret_cast<expression*>(parse(input));
+
+	int start = 0;
+	expression* result = reinterpret_cast<expression*>(parse(input, start));
 	double num = result->eval();
 	if (result->is_undefined) {
-		std::cout << "Не определено " << num;
+		std::cout << "Не определено ";
 		delete result;
 		return 0;
 	}
