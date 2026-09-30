@@ -29,32 +29,27 @@ struct expression : public value {
 
 		double first = val1->eval();
 		double second = val2->eval();
-		if (val1->is_undefined || val2->is_undefined) 
+		if (val1->is_undefined || val2->is_undefined)
 			return 0;
 		switch (op) {
-			case '/': {
-				if (second == 0) {
-					return 0;
-				}
-				val = first / second;
-				is_undefined = false;
-				return val;
+		case '/': {
+			if (second == 0) {
+				return 0;
 			}
-			case '*': {
-				val = first * second;
-				is_undefined = false;
-				return val;
-			}
-			case '+': {
-				val = first + second;
-				is_undefined = false;
-				return val;
-			}
-			case '-': {
-				val = first - second;
-				is_undefined = false;
-				return val;
-			}
+			val = first / second;
+			is_undefined = false;
+			return val;
+		}
+		case '*': {
+			val = first * second;
+			is_undefined = false;
+			return val;
+		}
+		case '+': {
+			val = first + second;
+			is_undefined = false;
+			return val;
+		}
 		}
 	}
 	~expression() {
@@ -75,15 +70,20 @@ struct expression : public value {
 	}
 };
 
-value* get_first_expression(std::string& str, int& pos);
+value* get_first_expression(std::string& str, int& pos, const char* start_num_value = "");
 
-value* parse(std::string& str, int& start, value* inherit_expr = nullptr) {
-	std::string num = "";
+value* parse(std::string& str, int& start, const char* start_num_value = "") {
+	std::string num = start_num_value;
+	value* inherit_expr = nullptr;
 	while (start < str.size()) {
 		char symbol = str[start];
+		if (symbol == ' ') {
+			start++;
+			continue;
+		}
+
 		if (symbol == '(') {
-			inherit_expr = get_first_expression(str, start);
-			++start;
+			inherit_expr = get_first_expression(str, start, start_num_value);
 			symbol = str[start];
 		}
 		if (symbol == '*' || symbol == '/') {
@@ -101,15 +101,15 @@ value* parse(std::string& str, int& start, value* inherit_expr = nullptr) {
 		if (symbol == '+' || symbol == '-') {
 			++start;
 			if (inherit_expr == nullptr) {
-				return new expression(new value(std::stod(num)), parse(str, start), symbol);
+				return new expression(new value(std::stod(num)), parse(str, start, (symbol == '-'? "-" : "")), '+');
 			}
-			return new expression(inherit_expr, parse(str, start), symbol);
+			return new expression(inherit_expr, parse(str, start, (symbol == '-' ? "-" : "")), '+');
 		}
 		if (symbol == '=' || symbol == ')') {
 			++start;
 			if (inherit_expr != nullptr)
 				return inherit_expr;
-			
+
 			return new value(std::stod(num));
 		}
 		num += symbol;
@@ -117,17 +117,19 @@ value* parse(std::string& str, int& start, value* inherit_expr = nullptr) {
 	}
 }
 
-value* parse_mod(std::string& str, int& start, value* inherit_expr = nullptr) {
-	return parse(str, start, nullptr);
-}
-
-value* get_first_expression(std::string& str, int& pos) {
-	std::string num = "";
+value* get_first_expression(std::string& str, int& pos, const char* start_num_value) {
+	std::string num = start_num_value;
 	while (pos < str.size()) {
 		char symbol = str[pos];
+		if (symbol == ' ') {
+			pos++;
+			continue;
+		}
 		if ((symbol < '0' || symbol > '9') && symbol != '.') {
 			if (symbol == '(') {
 				++pos;
+				if (start_num_value == "-")
+					return new expression(new value(-1), parse(str, pos), '*');
 				return parse(str, pos);
 			}
 			return new value(std::stod(num));
@@ -144,6 +146,7 @@ int validate(std::string& str, int pos = 0) {
 			return -1;
 		char symbol = str[pos];
 		if (symbol == ')') {
+			
 			return pos;
 		}
 		if (symbol == '(') {
@@ -160,7 +163,7 @@ int main() {
 	std::setlocale(LC_ALL, "Russian");
 
 	std::string input;
-	std::cin >> input;
+	std::getline(std::cin, input);
 
 	std::string extra_input = "(";
 	extra_input += input;
@@ -174,7 +177,15 @@ int main() {
 
 	int start = 0;
 	expression* result = reinterpret_cast<expression*>(parse(input, start));
-	double num = result->eval();
+	double num;
+	try {
+		num = result->eval();
+	}
+	catch (...) {
+		std::cout << "Некорректный ввод";
+		delete result;
+		return -1;
+	}
 	if (result->is_undefined) {
 		std::cout << "Не определено ";
 		delete result;
