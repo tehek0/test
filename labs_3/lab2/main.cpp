@@ -12,7 +12,7 @@ class arr : public std::vector<std::vector<std::string>> {
 public:
 	arr() = default;
 	arr(std::ifstream& file) : arr() {
-	
+
 		std::string line;
 		while (std::getline(file, line)) {
 			std::vector<std::string> p;
@@ -34,7 +34,7 @@ public:
 	};
 	void delete_elem(const std::string& str) {
 		int i = 0;
-		
+
 		for (auto elem : *this) {
 			int j = 0;
 			for (auto elem2 : elem) {
@@ -54,47 +54,93 @@ public:
 		this->at(k).push_back(item);
 	}
 	void print() {
-		char color = 0;
+		char color_i = 0;
 		for (auto elem : *this) {
-			std::cout << '\n';
+			std::cout << std::endl;
+			SetConsoleTextAttribute(hConsole, console_colors[color_i]);
+			(color_i > 3 ? color_i = 0 : color_i += 1);
 			for (auto elem2 : elem) {
+
 				
-				SetConsoleTextAttribute(hConsole, color[()]);
 				std::cout << ' ';
 				for (int i = 0; i < elem2.size(); ++i) {
 					std::cout << elem2[i];
 				}
 			}
 		}
+		SetConsoleTextAttribute(hConsole, 7);
 	}
-	void sort() {
-		for (int i = 0; i < this->size(); ++i) {
-			auto elem = this->at(i);
-			for (auto elem2 : elem) {
-				for (int i = 0; i < elem2.size() - 1; ++i) {
-					for (int j = i + 1; j < elem2.size(); ++j) {
-						if (elem2[i] > elem2[j]) {
-								auto temp = elem2[i];
-								elem2[i] = elem2[j];
-								elem2[j] = temp;
-						}
-					}
+
+	void sort_string(std::string& str) {
+		for (int c1 = 0; c1 < str.size() - 1; ++c1) {
+			for (int c2 = c1 + 1; c2 < str.size(); ++c2) {
+				if (str[c1] > str[c2]) {
+					auto temp = str[c1];
+					str[c1] = str[c2];
+					str[c2] = temp;
 				}
 			}
-			this->at(i) = elem;
 		}
 	}
 
+	void sort() {
+		for (int i = 0; i < this->size(); ++i) {
+			for (int j = 0; j < this->at(i).size(); ++j) {
+				this->sort_string(this->at(i).at(j));
+			}
+		}
+		
+	}
+
+	arr operator+(const arr& other) {
+		auto out = *this;
+		if (other.size() != out.size())
+			return out;
+
+		for (int i = 0; i < out.size(); ++i) {
+			for (int j = 0; j < out[i].size() && j < other[i].size(); ++j) {
+				out[i][j] += other[i][j];
+			}
+		}
+		return out;
+	}
+
+	arr& operator++() {
+		for (int i = 0; i < this->size(); ++i) {
+				for (int j = 0; j < this->at(i).size(); ++j) {
+					if (this->at(i)[j].size() != 0) {
+						char ch = this->at(i)[j][0];
+						if ((ch >= 'А' && ch <= 'Я') || (ch >= 'а' && ch <= 'я') || ch == 'Ё' || ch == 'ё') {
+							++this->at(i)[j][0];
+						}
+					}
+				}
+				
+		}
+		return *this;
+	}
+
+	arr operator++(int) {
+		return this->operator++();
+	}
 };
 
 
 
 int main(int argc, char** argv) {
-	
 	SetConsoleOutputCP(1251);
+	// ANSI
 	std::ifstream file("C:\\vs\\input2.txt");
 	arr l = arr(file);
-	l.add_endline(0, "12345");
+	l.add_endline(0, "512345");
 	l.add_endline(0, "67890");
 	l.print();
+	auto l2 = l;
+	l2.add_endline(1, "Доп линия");
+	l2.print();
+	arr l3 = l + l2;
+	l3.print();
+	l3++;
+	l3.print();
+	
 }
