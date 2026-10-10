@@ -7,7 +7,18 @@
 char console_colors[4] = { 4, 9, 2, 6 };
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-class arr : public std::vector<std::vector<std::string>> {
+class subarr : public std::vector<std::string> {
+public:
+	subarr() = default;
+	std::string& operator[](int i) {
+		if (this->size() <= i) {
+			this->resize(i + 1);
+		}
+		return this->at(i);
+	}
+};
+
+class arr : public std::vector<subarr> {
 	char selected_color_id = 0;
 public:
 	arr() = default;
@@ -15,7 +26,7 @@ public:
 
 		std::string line;
 		while (std::getline(file, line)) {
-			std::vector<std::string> p;
+			subarr p;
 			p.push_back(line);
 			this->push_back(p);
 		}
@@ -30,8 +41,9 @@ public:
 
 		this->at(i).erase(this->at(i).begin() + j);
 		this->at(i).shrink_to_fit();
+
 		if (this->at(i).size() == 0) {
-			for (int k = i; this->at(k).size() == 0; --k) {
+			for (int k = i; k >= 0 && this->at(k).size() == 0; --k) {
 				this->erase(this->begin() + k);
 			}
 		}
@@ -39,20 +51,19 @@ public:
 	void delete_elem(const std::string& str) {
 		int i = 0;
 
-		for (auto elem : *this) {
-			int j = 0;
-			for (auto elem2 : elem) {
-				if (elem2 == str) {
+		for (int i = this->size() - 1; i >= 0; --i) {
+			if (i >= this->size())
+				i = this->size() - 1;
+			for (int j = this->at(i).size() - 1; j >= 0; --j) {
+				if (this->at(i).at(j) == str) {
 					delete_elem(i, j);
 				}
-				++j;
 			}
-			++i;
 		}
 	}
 	void add_endline(int k, std::string item) {
-		while (k >= this->size()) {
-			this->push_back(std::vector<std::string>());
+		if (k >= this->size()) {
+			this->resize(k + 1);
 		}
 
 		this->at(k).push_back(item);
@@ -96,9 +107,9 @@ public:
 
 	}
 
-	arr operator+(const arr& other) {
+	arr operator+(arr& other) {
 		auto out = *this;
-		
+
 		for (int i = 0; i < out.size(); ++i) {
 			auto min_size = min(other[i].size(), out[i].size());
 			for (int j = 0; j < min_size; ++j) {
@@ -123,12 +134,12 @@ public:
 		return *this;
 	}
 
-	std::vector<std::string> operator[](int i) const {
+	subarr& operator[](int i) {
+		if (this->size() <= i) {
+			this->resize(i + 1);
+			this->at(i) = subarr();
+		}
 		return this->at(i);
-	}
-
-	std::string operator[](int j) const {
-		return this(i);
 	}
 
 	arr operator++(int) {
@@ -145,8 +156,8 @@ int main() {
 	std::ifstream file("C:\\vs\\input2.txt");
 	arr l = arr(file);
 	arr k;
-	k[0][0] = 1;
-	std::cout << k[0][0];
+	k[15][2] = "sasda";
+	std::cout << k[15][2];
 	l.sort();
 	l.print();
 	while (true) {
@@ -161,62 +172,62 @@ int main() {
 		std::cout << "Действие: " << '\n' << '\n' << "1. Добавить элемент в конец" << '\n' << "2. Отсортировать строку" << '\n' << "3. Удалить элемент" << '\n';
 		std::cin >> action;
 		switch (action) {
+		case 1: {
+			std::cout << "Строка: ";
+			std::string item;
+			std::cin >> item;
+			l.add_endline(x, item);
+			l.print();
+			break;
+		}
+		case 2: {
+			for (auto str : l[x]) {
+				l.sort_string(str);
+			}
+			l.print();
+			break;
+		}
+		case 3: {
+			int action2;
+			std::cout << "Действие: " << '\n' << '\n' << "1. Удалить по индексу" << '\n' << "2. Удалить по значению" << '\n';
+			std::cin >> action2;
+			switch (action2) {
 			case 1: {
-				std::cout << "Строка: ";
-				std::string item;
-				std::cin >> item;
-				l.add_endline(x, item);
+				int index;
+				std::cout << "Индекс: ";
+				std::cin >> index;
+				if (x >= l.size()) {
+					std::cout << "Пусто";
+					continue;
+				}
+				if (index < 0 || index >= l[x].size()) {
+					std::cout << "Некорректный индекс";
+					continue;
+				}
+				l.delete_elem(x, index);
 				l.print();
 				break;
 			}
 			case 2: {
-				for (auto str : l[x]) {
-					l.sort_string(str);
-				}
+				std::cout << "Строка: ";
+				std::string item;
+				std::cin >> item;
+				l.delete_elem(item);
 				l.print();
-				break;
-			}
-			case 3: {
-				int action2;
-				std::cout << "Действие: " << '\n' << '\n' << "1. Удалить по индексу" << '\n' << "2. Удалить по значению" << '\n';
-				std::cin >> action2;
-				switch (action2) {
-					case 1: {
-						int index;
-						std::cout << "Индекс: ";
-						std::cin >> index;
-						if (x >= l.size()) {
-							std::cout << "Пусто";
-							continue;
-						}
-						if (index < 0 || index >= l[x].size()) {
-							std::cout << "Некорректный индекс";
-							continue;
-						}
-						l.delete_elem(x, index);
-						l.print();
-						break;
-					}
-					case 2: {
-						std::cout << "Строка: ";
-						std::string item;
-						std::cin >> item;
-						l.delete_elem(item);
-						l.print();
-						break;
-					}
-					default: {
-						std::cout << "Некорректный ввод";
-						continue;
-					}
-				}
 				break;
 			}
 			default: {
 				std::cout << "Некорректный ввод";
 				continue;
 			}
+			}
+			break;
 		}
-		
+		default: {
+			std::cout << "Некорректный ввод";
+			continue;
+		}
+		}
+
 	}
 }
