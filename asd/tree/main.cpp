@@ -69,7 +69,80 @@ public:
             return search(current->l, key);
         return search(current->r, key);
     }
+    node* search_parent(node* current, node* child) {
+        if (!current || current->l == child || current->r == child)
+            return current;
+        if (child->key < current->key)
+            return search_parent(current->l, child);
+        return search_parent(current->r, child);
+    }
+    void insert(int k) {
+        node* current = head;
+        while (true) {
+            if (current->key == k)
+                return;
+            if (k > current->key) {
+                if (current->r) {
+                    current = current->r;
+                    continue;
+                }
+                current->r = new node(k);
+                return;
+            }
+            if (k < current->key) {
+                if (current->l) {
+                    current = current->l;
+                    continue;
+                }
+                current->l = new node(k);
+                return;
+            }
+        }
+    }
+    void remove(int k) {
+        node* to_remove = search(head, k);
+        if (to_remove) {
+            node* parent = to_remove;
+            if (to_remove->l) {
+                node* pred = parent->l;
+                node* pred_l = nullptr;
+                while (pred->r) {
+                    parent = pred;
+                    pred = pred->r;
+                    pred_l = pred->l;
+                }
+                parent->r = pred_l;
+                to_remove->key = pred->key;
+                delete pred;
+                return;
+            }
+            if (to_remove->r) {
+                node* succ = parent->r;
+                node* succ_r = nullptr;
+                while (succ->l) {
+                    parent = succ;
+                    succ = succ->l;
+                    succ_r = succ->r;
+                }
+                parent->r = succ_r;
+                to_remove->key = succ->key;
+                delete succ;
+                return;
+            }
+            parent = search_parent(head, to_remove);
+            if (parent->r == to_remove)
+                parent->r = nullptr;
+            if (parent->l == to_remove)
+                parent->l = nullptr;
+            if (!parent)
+                head = nullptr;
+            delete to_remove;
+        }
+    }
 
+    void print() {
+        print_recursion(head);
+    }
 private:
     void fill_tree(node* current, const std::string& input, int& pos) {
         std::string read = "";
@@ -130,15 +203,78 @@ private:
         std::cout << current->key << " ";
 
     }
+    void print_recursion(node* current) {
+        if (!current)
+            return;
+
+        std::cout << current->key;
+
+        if (!current->l && !current->r)
+            return;
+
+        std::cout << "(";
+        print_recursion(current->l);
+        std::cout << ", ";
+        print_recursion(current->r);
+        std::cout << ")";
+
+    }
 };
 
 int main()
 {
-    auto x = tree();
-    x.nlr();
-    std::cout << std::endl << std::endl;
-    x.lnr();
-    std::cout << std::endl << std::endl;
-    x.lrn();
-    std::cout << std::endl << std::endl;
+    std::setlocale(LC_ALL, "Russian");
+
+    auto tr = tree();
+
+    bool exit = false;
+    while (!exit) {
+        std::cout
+            << std::endl
+            << "1. Добавить вершину" << std::endl
+            << "2. Удалить вершину" << std::endl
+            << "3. Найти вершину" << std::endl
+            << "4. Выйти" << std::endl 
+            << std::endl;
+
+        int input;
+        std::cin >> input;
+        switch (input) {
+        case 1: {
+            std::cout << "Значение: ";
+            int key;
+            std::cin >> key;
+            tr.insert(key);
+            break;
+        }
+        case 2: {
+            std::cout << "Значение: ";
+            int key;
+            std::cin >> key;
+            tr.remove(key);
+            break;
+        }
+        case 3: {
+            std::cout << "Значение: ";
+            int key;
+            std::cin >> key;
+            node* n = tr.search(tr.head, key);
+            if (n) {
+                std::cout << "Найдено, адрес: " << n;
+            }
+            else {
+                std::cout << "Не найдено";
+            }
+            std::cout << std::endl;
+            break;
+        }
+        case 4: {
+            exit = true;
+            break;
+        }
+        default: break;
+        }
+    }
+    tr.print();
+    
 }
