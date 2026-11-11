@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QRandomGenerator>
+#include <QPixmap>
 #include <fstream>
 #include <map>
 #include <ctime>
@@ -242,6 +243,8 @@ int main(int argc, char *argv[])
     auto widget = new mainwindow();
     auto scene = new QGraphicsScene(QRect(0,0,1000,1000));
     auto gview = new QGraphicsView(scene, widget);
+    gview->setGeometry(0, 0, 1000, 1050);
+    scene->addPixmap(QPixmap(":/map.png"));
     gview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 
@@ -274,7 +277,6 @@ int main(int argc, char *argv[])
         b->resize(20,20);
         b->move(point - QPoint(-7, 12));
         b->setObjectName(QString("button_node_") + name);
-
 
         current_alpha++;
     }
