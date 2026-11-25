@@ -39,14 +39,14 @@ void code(std::ifstream& file) {
     }
 }
 
-std::vector<std::string> trans(std::ifstream& file) {
+std::vector<std::string> vector_symbol(std::ifstream& file) {
     std::vector<std::string> out;
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
             std::string code = "";
             for (int i = 0; i < line.size(); ++i) {
-                if (line[i] != '/' ) {
+                if (line[i] != '/') {
                     code += line[i];
                     if (i == line.size() - 1) {
                         out.emplace_back(code);
@@ -60,6 +60,12 @@ std::vector<std::string> trans(std::ifstream& file) {
             }
         }
     }
+    return out;
+}
+
+std::vector<std::string> trans(std::ifstream& file) {
+    std::vector<std::string> out = vector_symbol(file);
+    
     for (int j = 0; j < out.size(); ++j) {
         for (int i = 1; i < out[j].size(); ++i) {
             if (out[j][i] == '-' && rand() % 5 == 0) {
@@ -68,13 +74,14 @@ std::vector<std::string> trans(std::ifstream& file) {
             }
         }
     }
+    file.close();
     return out;
 }
 std::vector<std::string>* restore(std::vector<std::string>& code);
 
 bool is_decodeable(std::vector<std::string>& code) {
     for (auto symbol : code) {
-        if (mors.find(symbol) == mors.end()) {
+        if (symbol.size() && (mors.find(symbol) == mors.end())) {
             return false;
         }
     }
@@ -98,10 +105,10 @@ std::string decode_write(std::vector<std::string>& code) {
 }
 
 void decode(std::ifstream& file) {
-    auto code = trans(file);
+    auto code = vector_symbol(file);
     std::string string = "";
     bool decodeable = is_decodeable(code);
-    
+
     std::vector<std::string>* vars = nullptr;
     if (!decodeable) {
         std::cout << std::endl << "Неоднозначная расшифровка. Варианты:" << std::endl;
@@ -119,9 +126,17 @@ void decode(std::ifstream& file) {
         }
     }
     if (vars) {
+        std::string correct_string;
+        unsigned int correct_id = 0;
+        std::ifstream input_file;
+        input_file.open("input.txt");
+        std::getline(input_file, correct_string);
         for (int i = 0; i < vars->size(); ++i) {
             std::cout << i + 1 << ". " << vars->at(i) << std::endl;
+            if (vars->at(i) == correct_string)
+                correct_id = i + 1;
         }
+        std::cout << "Верный вариант: " << correct_id << std::endl;
         std::cout << "Вариант: ";
         unsigned int chosen = 0;
         while (!chosen || chosen > vars->size()) {
@@ -158,17 +173,23 @@ void restore_rec(std::vector<std::string>& code, int current_symbol, std::vector
         next_var.emplace_back(code[current_symbol]);
         restore_rec(code, current_symbol + 1, next_var, all_code_vars);
     }
-        for (int i = 1; i < code[current_symbol].size(); i++) {
-            if (code[current_symbol][i] == '*') {
-                auto new_symbol = code[current_symbol];
-                new_symbol[i] = '-';
-                if (mors.find(new_symbol) != mors.end()) {
-                    auto next_var(current_var);
-                    next_var.emplace_back(new_symbol);
-                    restore_rec(code, current_symbol + 1, next_var, all_code_vars);
-                }
+    else if (code[current_symbol].size() == 0) {
+        auto next_var(current_var);
+        next_var.emplace_back("");
+        restore_rec(code, current_symbol + 1, next_var, all_code_vars);
+        return;
+    }
+    for (int i = 1; i < code[current_symbol].size(); i++) {
+        if (code[current_symbol][i] == '*') {
+            auto new_symbol = code[current_symbol];
+            new_symbol[i] = '-';
+            if (mors.find(code[current_symbol]) != mors.end()) {
+                auto next_var(current_var);
+                next_var.emplace_back(code[current_symbol]);
+                restore_rec(code, current_symbol + 1, next_var, all_code_vars);
             }
         }
+    }
 }
 
 int main()
@@ -220,6 +241,7 @@ int main()
             << "1. Кодирование" << std::endl
             << "2. Передача" << std::endl
             << "3. Декодирование" << std::endl
+            << "4. Восстановление" << std::endl
             << std::endl;
         std::cin >> input;
         switch (input) {
@@ -231,10 +253,30 @@ int main()
         }
         case 2: {
             std::ifstream file;
-            file.open("p1_output.txt");
+            char in;
+            std::cout << "Наложить на переданынй файл? y/n" << '\n';
+            std::cin >> in;
+            switch(in) {
+            case 'y': {
+                file.open("p2_output.txt");
+                if (!file.is_open()) {
+                    std::cout << "Файл ещё не был передан." << '\n';
+                }
+                break;
+            }
+            case 'n': {
+                file.open("p1_output.txt");
+                if (!file.is_open()) {
+                    std::cout << "Файл не был закодирован." << '\n';
+                }
+                break;
+            }
+            }
             auto out = trans(file);
+            file.close();
 
             std::ofstream outfile("p2_output.txt");
+            outfile.flush();
             int count = 0;
             for (auto symbol : out) {
                 outfile << symbol;
@@ -246,8 +288,38 @@ int main()
         }
         case 3: {
             std::ifstream file;
-            file.open("p1_output.txt");
+            file.open("p2_output.txt");
             decode(file);
+            break;
+        }
+        case 4: {
+            std::ifstream file;
+            file.open("p2_output.txt");
+            std::string string = "";
+            std::string correct_string;
+            unsigned int correct_id = 0;
+            std::ifstream input_file;
+            input_file.open("input.txt");
+            std::getline(input_file, correct_string);
+            auto code = vector_symbol(file);
+            auto restored = restore(code);
+            if (restored) {
+
+                for (int i = 0; i < restored->size(); ++i) {
+                    std::cout << i + 1 << ". " << restored->at(i) << std::endl;
+                    if (restored->at(i) == correct_string)
+                        correct_id = i + 1;
+                }
+                std::cout << "Верный вариант: " << correct_id << std::endl;
+                std::cout << "Вариант: ";
+                unsigned int chosen = 0;
+                while (!chosen || chosen > restored->size()) {
+                    std::cin >> chosen;
+                }
+                string = restored->at(chosen - 1);
+            }
+            std::ofstream outfile("p3_output.txt");
+            outfile << string;
             break;
         }
         default: break;
