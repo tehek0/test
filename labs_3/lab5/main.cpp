@@ -179,13 +179,16 @@ void restore_rec(std::vector<std::string>& code, int current_symbol, std::vector
         restore_rec(code, current_symbol + 1, next_var, all_code_vars);
         return;
     }
+    
     for (int i = 1; i < code[current_symbol].size(); i++) {
+        
         if (code[current_symbol][i] == '*') {
             auto new_symbol = code[current_symbol];
             new_symbol[i] = '-';
-            if (mors.find(code[current_symbol]) != mors.end()) {
+            
+            if (mors.find(new_symbol) != mors.end()) {
                 auto next_var(current_var);
-                next_var.emplace_back(code[current_symbol]);
+                next_var.emplace_back(new_symbol);
                 restore_rec(code, current_symbol + 1, next_var, all_code_vars);
             }
         }
